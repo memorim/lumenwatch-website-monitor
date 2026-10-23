@@ -1,4 +1,4 @@
-# LumenWatch Agent
+# LumenWatch — мониторинг изменений сайтов
 
 Website change intelligence through HTTP capture, optional browser automation,
 SQLite history, a FastAPI dashboard and Model Context Protocol tools.
@@ -38,8 +38,8 @@ flowchart LR
 ## Quick start
 
 ```powershell
-git clone https://github.com/rom4ik1346/lumenwatch-agent.git
-cd lumenwatch-agent
+git clone https://github.com/memorim/lumenwatch-website-monitor.git
+cd lumenwatch-website-monitor
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 .\start.ps1
