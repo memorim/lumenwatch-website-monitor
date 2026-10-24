@@ -17,12 +17,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .node-version
       - run: node --test tests/escaping.test.mjs
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version-file: .python-version
           cache: pip
-      - run: python -m pip install -e ".[dev]"
+      - run: python -m pip install -c requirements-lock.txt -e ".[dev]"
       - run: python -m ruff check .
+      - run: python -m pip check
       - run: python -m pytest --cov=app --cov-report=term-missing

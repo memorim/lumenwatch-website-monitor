@@ -1,0 +1,25 @@
+name: Documentation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 4 * * 2'
+permissions:
+  contents: read
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  links:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+      - run: python .github/scripts/test_check_docs.py
+      - run: python .github/scripts/check_docs.py
+      - name: Public HTTP links (weekly or manual)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: python .github/scripts/check_docs.py --external
