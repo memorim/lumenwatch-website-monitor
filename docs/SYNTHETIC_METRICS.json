@@ -1,0 +1,14 @@
+{
+  "kind": "synthetic-local-asgi",
+  "date": "2026-10-24T02:17:24.530763+00:00",
+  "python": "3.12.14",
+  "platform": "win32",
+  "endpoint": "/api/overview",
+  "requests": 200,
+  "concurrency": 10,
+  "errors": 0,
+  "p50_ms": 17.33,
+  "p95_ms": 22.45,
+  "elapsed_ms": 355.22,
+  "limits": "In-process TestClient, temporary SQLite, synthetic seed; no external probe, TCP or hosted load."
+}

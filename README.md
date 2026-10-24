@@ -49,3 +49,5 @@ uvicorn app.main:app --host 127.0.0.1 --port 8020
 [Результаты проверки этой версии](docs/VERIFICATION.md).
 
 [Пример запроса и ответа API](docs/API_EXAMPLE.md).
+
+[Искусственные проверки и замеры](docs/SYNTHETIC_METRICS.json) · [Подготовка к собеседованию](docs/INTERVIEW.md)
