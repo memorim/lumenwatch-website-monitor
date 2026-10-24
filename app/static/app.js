@@ -1,3 +1,4 @@
+import { escapeHtml } from './escape.js';
 const state = {
   targets: [],
   changes: [],
@@ -72,9 +73,9 @@ function renderTargets() {
             <article class="target-card">
               <div class="target-top">
                 <div>
-                  <h3>${target.name}</h3>
-                  <a class="target-url" href="${target.url}" target="_blank" rel="noreferrer">
-                    ${target.url}
+                  <h3>${escapeHtml(target.name)}</h3>
+                  <a class="target-url" href="${escapeHtml(target.url)}" target="_blank" rel="noreferrer">
+                    ${escapeHtml(target.url)}
                   </a>
                 </div>
                 <span class="target-dot" aria-label="Active"></span>
@@ -122,8 +123,8 @@ function renderTimeline() {
             <button class="timeline-event" type="button" data-change-id="${change.id}">
               <span class="event-time">${formatTime(change.created_at)}</span>
               <span>
-                <strong class="event-title">${change.target_name}</strong>
-                <span class="event-summary">${change.summary}</span>
+                <strong class="event-title">${escapeHtml(change.target_name)}</strong>
+                <span class="event-summary">${escapeHtml(change.summary)}</span>
               </span>
               <span class="severity ${change.severity}">${change.severity}</span>
             </button>
@@ -142,7 +143,7 @@ function renderTimeline() {
 
 function renderWords(element, words) {
   element.innerHTML = words.length
-    ? words.map((word) => `<span>${word}</span>`).join("")
+    ? words.map((word) => `<span>${escapeHtml(word)}</span>`).join("")
     : "<small>None</small>";
 }
 
