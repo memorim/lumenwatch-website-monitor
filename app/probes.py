@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
 from pathlib import Path
 from time import perf_counter
@@ -10,6 +11,9 @@ from bs4 import BeautifulSoup
 
 from app.diff_engine import normalize_text
 from app.models import CaptureResult
+
+MAX_RESPONSE_BYTES = 2 * 1024 * 1024
+CAPTURE_TIMEOUT = 25
 
 
 class ProbeError(RuntimeError):
@@ -34,17 +38,46 @@ class HttpProbe:
         validate_url(url)
         started = perf_counter()
         try:
-            async with httpx.AsyncClient(
-                follow_redirects=True,
-                timeout=20,
-                headers={"User-Agent": "LumenWatch/1.0 (+website change monitor)"},
-            ) as client:
-                response = await client.get(url)
+            async with (
+                asyncio.timeout(CAPTURE_TIMEOUT),
+                httpx.AsyncClient(
+                    follow_redirects=False,
+                    timeout=20,
+                    headers={
+                        "User-Agent": "LumenWatch/1.0 (+website change monitor)",
+                        "Accept-Encoding": "identity",
+                    },
+                ) as client,
+            ):
+                for redirect in range(6):
+                    async with client.stream("GET", url) as response:
+                        # HTTPX automatic redirects buffer intermediate bodies; close them unread.
+                        if response.has_redirect_location:
+                            if redirect == 5:
+                                raise ProbeError("The target exceeded five redirects.")
+                            url = validate_url(str(response.url.join(response.headers["location"])))
+                            continue
+                        # ponytail: reject compression to bound memory before HTML parsing;
+                        # support compressed targets only with a bounded streaming decoder.
+                        if (
+                            response.headers.get("content-encoding", "identity").lower()
+                            != "identity"
+                        ):
+                            raise ProbeError("Unsupported response encoding; identity is required.")
+                        body = bytearray()
+                        async for chunk in response.aiter_raw():
+                            if len(body) + len(chunk) > MAX_RESPONSE_BYTES:
+                                raise ProbeError("The target response exceeds 2 MiB.")
+                            body.extend(chunk)
+                        text = body.decode(response.encoding or "utf-8", errors="replace")
+                        break
+        except TimeoutError as error:
+            raise ProbeError("The capture deadline was exceeded.") from error
         except httpx.HTTPError as error:
             raise ProbeError("The target could not be reached.") from error
 
         elapsed_ms = round((perf_counter() - started) * 1000)
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(text, "html.parser")
         for node in soup(["script", "style", "noscript", "svg"]):
             node.decompose()
         title = normalize_text(soup.title.get_text()) if soup.title else urlparse(url).netloc
