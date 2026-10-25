@@ -60,8 +60,10 @@ CI installs locked dependencies and runs the configured checks; documentation ch
 
 ## Limits and next steps
 
-- Trusted local targets only. The HTTP/browser capture path is not an SSRF-hardened public URL service: it follows redirects and can reach networks available to the host.
-- No public accounts or tenant isolation. Large response bounds and concurrent snapshot ordering deserve a dedicated follow-up before untrusted/public deployment.
+- A single trusted local operator controls targets through REST or stdio MCP. Private and loopback targets are intentionally supported. The HTTP/browser capture path is not an SSRF-hardened public URL service: redirects and browser subresources can reach networks available to the host.
+- Keep the API on `127.0.0.1`. Docker Compose publishes only `127.0.0.1:8020`; the container's internal `0.0.0.0` listener is required for that mapping. Do not change the mapping, expose it through a tunnel/reverse proxy, or grant untrusted containers access to its network. There are no public accounts or tenant isolation.
+- HTTP capture has a 25-second network deadline, at most five redirects and a 2 MiB body budget before HTML parsing. Compression is refused even if a server ignores `Accept-Encoding: identity`, to avoid decompressing an unbounded body. Such targets return a capture error.
+- Browser mode remains opt-in and intended only for trusted pages: page JavaScript, subresources, full-page screenshots and concurrent manual captures have no comprehensive resource sandbox. Keep it disabled for unknown targets. The HTTP limits do not apply to Chromium; public deployment is unsupported.
 
 ## Further documentation
 

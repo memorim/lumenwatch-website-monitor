@@ -2,7 +2,7 @@ services:
   lumenwatch:
     build: .
     ports:
-      - "8020:8020"
+      - "127.0.0.1:8020:8020"
     volumes:
       - lumenwatch-data:/data
 
