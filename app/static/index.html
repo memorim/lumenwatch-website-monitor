@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-<div role="note" style="padding:9px 16px;background:#222;color:#fff;font:12px/1.5 system-ui;text-align:center">Портфолио-демо · Данные-примеры · Без реальных заказов, оплаты и отправки писем</div>
     <header class="site-header">
       <a class="brand" href="/">
         <span class="brand-orbit"><i></i></span>
@@ -34,19 +33,20 @@
           <p class="overline">WEB OPERATIONS / 2026</p>
           <h1>Know what changed <em>before</em> users tell you.</h1>
           <p class="hero-description">
-            LumenWatch captures critical pages, understands the difference and keeps an
-            evidence trail your team can act on.
+            LumenWatch captures critical pages, understands the difference and
+            keeps an evidence trail your team can act on.
           </p>
         </div>
-        <div class="hero-visual" aria-hidden="true">
-          <div class="radar">
-            <span class="radar-line one"></span>
-            <span class="radar-line two"></span>
-            <span class="radar-line three"></span>
-            <i class="blip first"></i>
-            <i class="blip second"></i>
-          </div>
-          <div class="radar-label">
+        <div class="hero-visual">
+          <img
+            class="hero-photo"
+            src="/static/photos/hero.webp"
+            alt="Освещённые окна городского здания в вечернее время"
+            width="1440"
+            height="2160"
+            fetchpriority="high"
+          />
+          <div class="visual-caption">
             <span>WATCH TARGETS</span>
             <strong id="hero-target-count">00</strong>
             <small>monitored surfaces</small>
@@ -69,7 +69,12 @@
           </label>
           <label class="url-field">
             <span>URL</span>
-            <input name="url" type="url" placeholder="https://example.com/pricing" required />
+            <input
+              name="url"
+              type="url"
+              placeholder="https://example.com/pricing"
+              required
+            />
           </label>
           <label>
             <span>Every</span>
@@ -175,7 +180,8 @@
               <div id="removed-words" class="word-list removed"></div>
             </div>
           </div>
-          <pre id="content-preview" class="content-preview">No capture selected.</pre>
+          <pre id="content-preview" class="content-preview">
+No capture selected.</pre>
         </aside>
       </section>
     </main>
@@ -191,4 +197,3 @@
     <script type="module" src="/static/app.js"></script>
   </body>
 </html>
-
