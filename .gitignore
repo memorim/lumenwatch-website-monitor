@@ -9,4 +9,4 @@ htmlcov/
 *.egg-info/
 .env
 data/
-
+_site/
