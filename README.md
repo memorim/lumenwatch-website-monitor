@@ -1,32 +1,33 @@
-# LumenWatch — Website Change Monitor
+# LumenWatch — отслеживание изменений сайтов
 
-Capture page versions and explain text changes between saved snapshots.
+Сохранение версий страниц, сравнение текста и история изменений в одном интерфейсе.
 
 
-![Desktop interface](docs/desktop.png)
 
-<img src="docs/mobile.png" width="320" alt="Mobile interface">
+![Компьютерная версия](docs/desktop.png)
 
-[Short interaction recording](docs/demo.gif)
+<img src="docs/mobile.png" width="320" alt="Мобильная версия">
 
-## Implemented
+[Короткая демонстрация](docs/demo.gif)
 
-- HTTP captures, extracted text diffs, snapshot history and change levels.
-- Responsive dashboard, REST API, MCP tools and an optional scheduler.
-- Optional Playwright capture for JavaScript-rendered pages.
+## Возможности
 
-## Stack and architecture
+- HTTP-снимки, извлечение текста, различия и уровни изменений.
+- Адаптивная панель, REST API, MCP и необязательный планировщик.
+- Необязательный захват JavaScript-страниц через Playwright.
 
-Python, FastAPI, HTTPX, Beautiful Soup, SQLite, optional Playwright and MCP.
+## Стек и устройство
 
-## Technical mechanisms and security
+Python, FastAPI, HTTPX, Beautiful Soup, SQLite, MCP и необязательный Playwright.
 
-- REST and MCP reuse the same service logic and persistence. Browser capture is optional; it is not needed by the basic HTTP path.
-- Stored page versions make diffs inspectable. Analysis uses deterministic comparison rules.
+## Ключевые решения
 
-## Local setup
+- REST и MCP используют общий сервис и слой хранения. Базовому HTTP-захвату не нужен браузер.
+- Сохранённые версии позволяют проверить различия; сравнение выполняется по детерминированным правилам.
 
-Python 3.12.14 (see `.python-version`). Activate the virtual environment before the remaining commands.
+## Локальный запуск
+
+Python 3.12.14, как в `.python-version`. Перед установкой зависимостей активируйте виртуальное окружение.
 
 ```bash
 python -m venv .venv
@@ -36,15 +37,17 @@ python -m pip install -c requirements-lock.txt -e ".[dev]"
 uvicorn app.main:app --host 127.0.0.1 --port 8020
 ```
 
-## Configuration
+Команда запуска привязывает API к локальному адресу 127.0.0.1.
 
-Use [.env.example](.env.example) for supported configuration and keep secrets outside Git. See [configuration details](docs/TECHNICAL.md) for loading settings and optional services.
+## Настройки
 
-## Database and upgrades
+Доступные параметры перечислены в [.env.example](.env.example). Секреты храните вне Git. Порядок загрузки настроек и необязательные службы описаны в [технической документации](docs/TECHNICAL.md).
 
-The SQLite schema initializes on startup. Database/capture paths are configurable; keep persistent data outside temporary build directories.
+## Данные и обновления
 
-## Verification
+Схема SQLite создаётся при запуске. Пути к базе и снимкам настраиваются; постоянные данные должны находиться вне временных каталогов сборки.
+
+## Проверки
 
 ```bash
 python -m pytest -q
@@ -54,19 +57,17 @@ python -m pip check
 python -m ruff check .
 ```
 
-Existing HTTP/browser adapters are replaced with fixtures in unit tests; the current suite, Ruff, OpenAPI and previous-version upgrade checks are reproducible locally.
+Контролируемые HTTP/браузерные заглушки позволяют запускать pytest без внешних сайтов; также проверяются Ruff, OpenAPI, миграции и HTML-экранирование.
 
-CI installs locked dependencies and runs the configured checks; documentation checks also validate local links/images. Python dependency auditing uses `pip-audit --disable-pip --no-deps --strict -r requirements-lock.txt`. A passing scanner only reports known advisories at the time of the run.
+CI устанавливает зависимости по зафиксированным версиям и запускает настроенные проверки. Отдельная проверка документации находит неверные локальные ссылки и изображения. Проверка уязвимостей учитывает известные проблемы на момент запуска.
 
-## Limits and next steps
+## Ограничения
 
-- A single trusted local operator controls targets through REST or stdio MCP. Private and loopback targets are intentionally supported. The HTTP/browser capture path is not an SSRF-hardened public URL service: redirects and browser subresources can reach networks available to the host.
-- Keep the API on `127.0.0.1`. Docker Compose publishes only `127.0.0.1:8020`; the container's internal `0.0.0.0` listener is required for that mapping. Do not change the mapping, expose it through a tunnel/reverse proxy, or grant untrusted containers access to its network. There are no public accounts or tenant isolation.
-- HTTP capture has a 25-second network deadline, at most five redirects and a 2 MiB body budget before HTML parsing. Compression is refused even if a server ignores `Accept-Encoding: identity`, to avoid decompressing an unbounded body. Such targets return a capture error.
-- Browser mode remains opt-in and intended only for trusted pages: page JavaScript, subresources, full-page screenshots and concurrent manual captures have no comprehensive resource sandbox. Keep it disabled for unknown targets. The HTTP limits do not apply to Chromium; public deployment is unsupported.
+- Один доверенный локальный оператор задаёт цели через REST или stdio MCP. Loopback и приватные цели поддерживаются намеренно; приложение не является публичным сервисом с защитой от SSRF.
+- API должен оставаться на 127.0.0.1. Compose публикует только 127.0.0.1:8020; не меняйте привязку на внешний адрес и не открывайте доступ недоверенным контейнерам, туннелям и прокси. Публичных аккаунтов и изоляции клиентов нет.
+- HTTP-захват ограничен 25 секундами, пятью редиректами и 2 MiB до разбора HTML. Сжатый ответ отклоняется даже при игнорировании Accept-Encoding: identity.
+- Браузерный режим включается явно и предназначен для доверенных страниц. JavaScript, подресурсы, полностраничные снимки и параллельные ручные захваты не имеют полного ограничения ресурсов. Лимиты HTTP не относятся к Chromium; публичное размещение не поддерживается.
 
-## Further documentation
+## Документация
 
-[Audit findings and follow-up](docs/AUDIT_2026_10.md) · [Technical reference](docs/TECHNICAL.md) · [Change history](CHANGELOG.md)
-
-[API request/response example](docs/API_EXAMPLE.md)
+[Результаты аудита](docs/AUDIT_2026_10.md) · [Техническая документация](docs/TECHNICAL.md) · [Пример запроса и ответа](docs/API_EXAMPLE.md) · [История изменений](CHANGELOG.md)
