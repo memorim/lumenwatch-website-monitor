@@ -22,7 +22,7 @@ Python, FastAPI, HTTPX, Beautiful Soup, SQLite, optional Playwright and MCP.
 ## Technical mechanisms and security
 
 - REST and MCP reuse the same service logic and persistence. Browser capture is optional; it is not needed by the basic HTTP path.
-- Stored page versions make diffs inspectable. Analysis is deterministic rather than an unconfigured LLM feature.
+- Stored page versions make diffs inspectable. Analysis uses deterministic comparison rules.
 
 ## Local setup
 
