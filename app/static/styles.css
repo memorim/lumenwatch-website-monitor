@@ -1,15 +1,15 @@
 :root {
   color-scheme: light;
-  --paper: #f3f0e7;
-  --paper-2: #e9e4d6;
-  --ink: #132b24;
-  --muted: #65756f;
-  --line: rgba(19, 43, 36, 0.18);
-  --lime: #c6f36b;
-  --orange: #ff7048;
-  --mint: #8de2c3;
-  --white: #fffdf7;
-  --shadow: 0 20px 60px rgba(19, 43, 36, 0.09);
+  --paper: #f7f7f5;
+  --paper-2: #e2e2df;
+  --ink: #202020;
+  --muted: #686868;
+  --line: #e2e2df;
+  --signal: #ea4542;
+  --changed: #ea4542;
+  --tint: #fad6d3;
+  --white: #ffffff;
+  --shadow: 0 20px 60px rgba(24, 24, 25, 0.09);
   font-family:
     "Segoe UI",
     ui-sans-serif,
@@ -31,8 +31,8 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(rgba(19, 43, 36, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(19, 43, 36, 0.025) 1px, transparent 1px),
+    linear-gradient(rgba(24, 24, 25, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 24, 25, 0.025) 1px, transparent 1px),
     var(--paper);
   background-size: 32px 32px;
 }
@@ -63,7 +63,7 @@ a {
   min-height: 78px;
   padding: 14px clamp(20px, calc(5vw / var(--page-zoom, 1)), 74px);
   color: var(--white);
-  background: rgba(19, 43, 36, 0.96);
+  background: rgba(24, 24, 25, 0.96);
   backdrop-filter: blur(16px);
 }
 
@@ -84,7 +84,7 @@ a {
 
 .brand small {
   margin-top: 2px;
-  color: #aac0b7;
+  color: #bcbcb8;
   font-size: 0.72rem;
 }
 
@@ -110,9 +110,9 @@ a {
   right: 4px;
   width: 9px;
   height: 9px;
-  background: var(--lime);
+  background: var(--signal);
   border-radius: 50%;
-  box-shadow: 0 0 16px var(--lime);
+  box-shadow: 0 0 16px var(--signal);
 }
 
 nav {
@@ -122,11 +122,11 @@ nav {
 }
 
 nav a {
-  color: #d2dfd9;
+  color: #dededb;
 }
 
 nav a:hover {
-  color: var(--lime);
+  color: var(--signal);
 }
 
 .agent-status {
@@ -134,16 +134,16 @@ nav a:hover {
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #cbdad4;
+  color: #dededb;
   font-size: 0.77rem;
 }
 
 .agent-status span {
   width: 8px;
   height: 8px;
-  background: var(--lime);
+  background: var(--signal);
   border-radius: 50%;
-  box-shadow: 0 0 0 5px rgba(198, 243, 107, 0.13);
+  box-shadow: 0 0 0 5px rgba(234, 69, 66, 0.13);
 }
 
 main {
@@ -192,7 +192,7 @@ h1 {
 }
 
 h1 em {
-  color: var(--orange);
+  color: var(--changed);
   font-weight: inherit;
 }
 
@@ -226,7 +226,7 @@ h2 {
   position: absolute;
   width: 360px;
   height: 360px;
-  background: var(--lime);
+  background: var(--signal);
   filter: blur(130px);
   opacity: 0.16;
 }
@@ -299,7 +299,7 @@ select {
 input:focus,
 select:focus {
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(19, 43, 36, 0.08);
+  box-shadow: 0 0 0 3px rgba(24, 24, 25, 0.08);
 }
 
 .checkbox-label {
@@ -334,7 +334,7 @@ button {
 
 button:hover {
   color: var(--ink);
-  background: var(--lime);
+  background: var(--signal);
 }
 
 button:disabled {
@@ -350,7 +350,7 @@ button:disabled {
 }
 
 .message.error {
-  color: #b5321f;
+  color: #9e3330;
 }
 
 .metrics {
@@ -371,7 +371,7 @@ button:disabled {
 }
 
 .metrics article.accent {
-  background: var(--lime);
+  background: var(--signal);
 }
 
 .metrics span,
@@ -432,8 +432,8 @@ button:disabled {
   padding: 23px;
   flex-direction: column;
   border: 1px solid var(--line);
-  background: rgba(255, 253, 247, 0.7);
-  box-shadow: 0 0 0 rgba(19, 43, 36, 0);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 rgba(24, 24, 25, 0);
   transition: 180ms ease;
 }
 
@@ -469,9 +469,9 @@ button:disabled {
 .target-dot {
   width: 11px;
   height: 11px;
-  background: var(--mint);
+  background: var(--tint);
   border-radius: 50%;
-  box-shadow: 0 0 0 7px rgba(141, 226, 195, 0.19);
+  box-shadow: 0 0 0 7px rgba(250, 214, 211, 0.19);
 }
 
 .target-meta {
@@ -528,8 +528,8 @@ button:disabled {
 }
 
 .severity.high {
-  color: #c33d25;
-  background: rgba(255, 112, 72, 0.11);
+  color: #9e3330;
+  background: rgba(234, 69, 66, 0.11);
 }
 
 .severity.medium {
@@ -538,14 +538,14 @@ button:disabled {
 }
 
 .severity.low {
-  color: #20745e;
-  background: rgba(141, 226, 195, 0.15);
+  color: #444444;
+  background: rgba(250, 214, 211, 0.15);
 }
 
 .severity.none,
 .severity.baseline {
   color: var(--muted);
-  background: rgba(101, 117, 111, 0.08);
+  background: rgba(120, 120, 120, 0.08);
 }
 
 .activity-grid {
@@ -595,7 +595,7 @@ button:disabled {
 }
 
 .timeline-event:hover .event-title {
-  color: var(--orange);
+  color: var(--changed);
 }
 
 .event-time {
@@ -631,12 +631,12 @@ button:disabled {
 }
 
 .diff-panel .overline {
-  color: var(--lime);
+  color: var(--signal);
 }
 
 .detail-summary {
   margin: 23px 0;
-  color: #bad0c7;
+  color: #bcbcb8;
   line-height: 1.65;
 }
 
@@ -662,7 +662,7 @@ button:disabled {
 
 .detail-stats span {
   margin-bottom: 8px;
-  color: #8ba399;
+  color: #bcbcb8;
   font-size: 0.66rem;
 }
 
@@ -681,7 +681,7 @@ button:disabled {
 
 .word-diff h3 {
   margin-bottom: 11px;
-  color: #9fb6ad;
+  color: #bcbcb8;
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -702,13 +702,13 @@ button:disabled {
 }
 
 .word-list.added span {
-  color: #dffff2;
-  background: rgba(141, 226, 195, 0.19);
+  color: #fad6d3;
+  background: rgba(250, 214, 211, 0.19);
 }
 
 .word-list.removed span {
-  color: #ffded5;
-  background: rgba(255, 112, 72, 0.17);
+  color: #fad6d3;
+  background: rgba(234, 69, 66, 0.17);
   text-decoration: line-through;
 }
 
@@ -717,9 +717,9 @@ button:disabled {
   margin: 25px 0 0;
   padding: 17px;
   overflow: auto;
-  color: #9fb6ad;
+  color: #bcbcb8;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  background: #0c201a;
+  background: #181819;
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   font-size: 0.72rem;
   line-height: 1.55;
@@ -886,7 +886,7 @@ footer strong {
   position: relative;
   min-height: 360px;
   overflow: hidden;
-  background: #17352c;
+  background: #181819;
 }
 .hero-photo {
   position: absolute;
@@ -902,7 +902,7 @@ footer strong {
   padding: 18px 24px;
   border: 1px solid #ffffff33;
   border-radius: 12px;
-  background: #102c24e6;
+  background: #181819e6;
   color: #fff;
   text-align: right;
 }
@@ -914,7 +914,7 @@ footer strong {
 .visual-caption span {
   font-size: 11px;
   letter-spacing: 0.14em;
-  color: #c6f36b;
+  color: #ea4542;
 }
 .visual-caption strong {
   font:
@@ -922,7 +922,7 @@ footer strong {
     serif;
 }
 .visual-caption small {
-  color: #d3e3db;
+  color: #dededb;
 }
 @media (max-width: 1050px) and (max-width: 800px), (min-width: 801px) and (max-width: 1312.5px) {
   .hero-visual {
