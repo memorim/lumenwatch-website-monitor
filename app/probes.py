@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import ipaddress
+import os
+import socket
 from pathlib import Path
 from time import perf_counter
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 import httpx
 from bs4 import BeautifulSoup
@@ -47,15 +50,27 @@ class HttpProbe:
                         "User-Agent": "LumenWatch/1.0 (+website change monitor)",
                         "Accept-Encoding": "identity",
                     },
+                    trust_env=False,
                 ) as client,
             ):
                 for redirect in range(6):
-                    async with client.stream("GET", url) as response:
+                    request_url, headers, extensions = url, {}, {}
+                    if os.getenv("LUMENWATCH_PUBLIC_ORIGIN"):
+                        parsed = urlparse(url)
+                        if parsed.port not in {None, 80, 443}:
+                            raise ProbeError("Only standard HTTP(S) ports are allowed.")
+                        addresses = await asyncio.get_running_loop().getaddrinfo(parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80), type=socket.SOCK_STREAM)
+                        if not addresses or any(not ipaddress.ip_address(item[4][0]).is_global for item in addresses):
+                            raise ProbeError("Only public network targets are allowed.")
+                        request_url = httpx.URL(url).copy_with(host=addresses[0][4][0])
+                        headers = {"Host": parsed.netloc}
+                        extensions = {"sni_hostname": parsed.hostname}
+                    async with client.stream("GET", request_url, headers=headers, extensions=extensions) as response:
                         # HTTPX automatic redirects buffer intermediate bodies; close them unread.
                         if response.has_redirect_location:
                             if redirect == 5:
                                 raise ProbeError("The target exceeded five redirects.")
-                            url = validate_url(str(response.url.join(response.headers["location"])))
+                            url = validate_url(urljoin(url, response.headers["location"]))
                             continue
                         # ponytail: reject compression to bound memory before HTML parsing;
                         # support compressed targets only with a bounded streaming decoder.
@@ -73,7 +88,7 @@ class HttpProbe:
                         break
         except TimeoutError as error:
             raise ProbeError("The capture deadline was exceeded.") from error
-        except httpx.HTTPError as error:
+        except (httpx.HTTPError, OSError) as error:
             raise ProbeError("The target could not be reached.") from error
 
         elapsed_ms = round((perf_counter() - started) * 1000)

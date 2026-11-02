@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import asyncio
 from pathlib import Path
 from typing import Protocol
 
 from app.database import Database
 from app.diff_engine import compare_snapshots
 from app.models import CaptureResult
-from app.probes import BrowserProbe, HttpProbe
+from app.probes import BrowserProbe, HttpProbe, ProbeError
 
 
 class Probe(Protocol):
@@ -35,12 +36,19 @@ class MonitorService:
         browser_enabled: bool,
         probe_factory: ProbeFactory = default_probe_factory,
     ) -> None:
+        self._capacity = asyncio.Semaphore(2)
         self.database = database
         self.capture_directory = capture_directory
         self.browser_enabled = browser_enabled
         self.probe_factory = probe_factory
 
     async def run_target(self, target_id: str) -> dict:
+        if self._capacity.locked():
+            raise ProbeError("Capture capacity exhausted; retry later.")
+        async with self._capacity:
+            return await self._run_target(target_id)
+
+    async def _run_target(self, target_id: str) -> dict:
         target = self.database.get_target(target_id)
         if not target:
             raise TargetNotFoundError("Watch target was not found.")
