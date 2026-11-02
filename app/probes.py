@@ -7,7 +7,7 @@ import os
 import socket
 from pathlib import Path
 from time import perf_counter
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin, urlparse
 
 import httpx
 from bs4 import BeautifulSoup
@@ -59,13 +59,21 @@ class HttpProbe:
                         parsed = urlparse(url)
                         if parsed.port not in {None, 80, 443}:
                             raise ProbeError("Only standard HTTP(S) ports are allowed.")
-                        addresses = await asyncio.get_running_loop().getaddrinfo(parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80), type=socket.SOCK_STREAM)
-                        if not addresses or any(not ipaddress.ip_address(item[4][0]).is_global for item in addresses):
+                        addresses = await asyncio.get_running_loop().getaddrinfo(
+                            parsed.hostname,
+                            parsed.port or (443 if parsed.scheme == "https" else 80),
+                            type=socket.SOCK_STREAM,
+                        )
+                        if not addresses or any(
+                            not ipaddress.ip_address(item[4][0]).is_global for item in addresses
+                        ):
                             raise ProbeError("Only public network targets are allowed.")
                         request_url = httpx.URL(url).copy_with(host=addresses[0][4][0])
                         headers = {"Host": parsed.netloc}
                         extensions = {"sni_hostname": parsed.hostname}
-                    async with client.stream("GET", request_url, headers=headers, extensions=extensions) as response:
+                    async with client.stream(
+                        "GET", request_url, headers=headers, extensions=extensions
+                    ) as response:
                         # HTTPX automatic redirects buffer intermediate bodies; close them unread.
                         if response.has_redirect_location:
                             if redirect == 5:

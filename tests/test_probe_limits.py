@@ -112,10 +112,14 @@ def test_compose_does_not_publish_the_unauthenticated_api_to_the_lan():
 
 def test_public_probe_rejects_private_dns_before_connecting(monkeypatch):
     monkeypatch.setenv("LUMENWATCH_PUBLIC_ORIGIN", "https://monitor.example")
+
     async def resolve(*args, **kwargs):
         return [(2, 1, 6, "", ("127.0.0.1", 443))]
+
     monkeypatch.setattr(asyncio.BaseEventLoop, "getaddrinfo", resolve)
-    install_transport(monkeypatch, lambda _: (_ for _ in ()).throw(AssertionError("must not connect")))
+    install_transport(
+        monkeypatch, lambda _: (_ for _ in ()).throw(AssertionError("must not connect"))
+    )
     with pytest.raises(probes.ProbeError, match="public network"):
         asyncio.run(probes.HttpProbe().capture("https://target.example/", "fixture"))
 
@@ -123,15 +127,19 @@ def test_public_probe_rejects_private_dns_before_connecting(monkeypatch):
 def test_public_probe_pins_ip_and_revalidates_redirects(monkeypatch):
     monkeypatch.setenv("LUMENWATCH_PUBLIC_ORIGIN", "https://monitor.example")
     resolutions = []
+
     async def resolve(_self, host, *args, **kwargs):
         resolutions.append(host)
         return [(2, 1, 6, "", ("8.8.8.8" if len(resolutions) == 1 else "10.0.0.1", 443))]
+
     monkeypatch.setattr(asyncio.BaseEventLoop, "getaddrinfo", resolve)
+
     def handler(request):
         assert request.url.host == "8.8.8.8"
         assert request.headers["host"] == "target.example"
         assert request.extensions["sni_hostname"] == "target.example"
         return httpx.Response(302, headers={"Location": "/next"})
+
     install_transport(monkeypatch, handler)
     with pytest.raises(probes.ProbeError, match="public network"):
         asyncio.run(probes.HttpProbe().capture("https://target.example/", "fixture"))

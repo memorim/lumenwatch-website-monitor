@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
-import os
 import hmac
-from urllib.parse import urlparse
+import os
+from contextlib import asynccontextmanager
 from pathlib import Path
+from urllib.parse import urlparse
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
@@ -35,12 +35,23 @@ def create_app(
     auth_token = os.getenv("LUMENWATCH_AUTH_TOKEN", "")
     if public_origin:
         origin = urlparse(public_origin)
-        if origin.scheme != "https" or not origin.netloc or origin.path not in {"", "/"} or origin.query or origin.fragment or origin.username:
+        if (
+            origin.scheme != "https"
+            or not origin.netloc
+            or origin.path not in {"", "/"}
+            or origin.query
+            or origin.fragment
+            or origin.username
+        ):
             raise ValueError("LUMENWATCH_PUBLIC_ORIGIN must be an HTTPS origin")
         if len(auth_token) < 32:
-            raise ValueError("Public access requires LUMENWATCH_AUTH_TOKEN of at least 32 characters")
+            raise ValueError(
+                "Public access requires LUMENWATCH_AUTH_TOKEN of at least 32 characters"
+            )
         if browser_enabled():
-            raise ValueError("Public browser capture requires an isolated worker; disable browser mode")
+            raise ValueError(
+                "Public browser capture requires an isolated worker; disable browser mode"
+            )
     database = Database(database_file or database_path())
     resolved_capture_path = capture_path or capture_directory()
     resolved_capture_path.mkdir(parents=True, exist_ok=True)
@@ -68,14 +79,19 @@ def create_app(
         description="Website change intelligence through REST and MCP.",
         lifespan=lifespan,
     )
+
     @application.middleware("http")
     async def access_boundary(request, call_next):
         if public_origin:
             if request.headers.get("host") != origin.netloc:
                 return JSONResponse({"detail": "Host not allowed"}, status_code=403)
-            if not hmac.compare_digest(request.headers.get("authorization", "").encode(), ("Bearer " + auth_token).encode()):
+            if not hmac.compare_digest(
+                request.headers.get("authorization", "").encode(), ("Bearer " + auth_token).encode()
+            ):
                 return JSONResponse({"detail": "Authentication required"}, status_code=401)
-            if request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("origin", public_origin.rstrip("/")) != public_origin.rstrip("/"):
+            if request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get(
+                "origin", public_origin.rstrip("/")
+            ) != public_origin.rstrip("/"):
                 return JSONResponse({"detail": "Origin not allowed"}, status_code=403)
         response = await call_next(request)
         response.headers["Cache-Control"] = "no-store"
