@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from collections.abc import Callable
 from pathlib import Path
 from typing import Protocol
 
 from app.database import Database
 from app.diff_engine import compare_snapshots
+from app.isolated_browser import IsolatedBrowserProbe
 from app.models import CaptureResult
 from app.probes import BrowserProbe, HttpProbe, ProbeError
 
@@ -24,6 +26,8 @@ class TargetNotFoundError(RuntimeError):
 
 def default_probe_factory(target: dict, capture_directory: Path, browser_enabled: bool) -> Probe:
     if target["render_js"] and browser_enabled:
+        if os.getenv("LUMENWATCH_ISOLATED_BROWSER_IMAGE"):
+            return IsolatedBrowserProbe(capture_directory)
         return BrowserProbe(capture_directory)
     return HttpProbe()
 

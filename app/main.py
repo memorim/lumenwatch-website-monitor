@@ -48,7 +48,7 @@ def create_app(
             raise ValueError(
                 "Public access requires LUMENWATCH_AUTH_TOKEN of at least 32 characters"
             )
-        if browser_enabled():
+        if browser_enabled() and not os.getenv("LUMENWATCH_ISOLATED_BROWSER_IMAGE"):
             raise ValueError(
                 "Public browser capture requires an isolated worker; disable browser mode"
             )
