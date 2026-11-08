@@ -1,0 +1,5 @@
+# Replace the hostname with the operator's real HTTPS origin.
+# Caddy obtains and renews the certificate automatically.
+lumenwatch.example.com {
+    reverse_proxy 127.0.0.1:8020
+}
