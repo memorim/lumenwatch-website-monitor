@@ -1,0 +1,27 @@
+services:
+  lumenwatch:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8020:8020"
+    environment:
+      LUMENWATCH_PUBLIC_ORIGIN: ${LUMENWATCH_PUBLIC_ORIGIN:?set an HTTPS origin}
+      LUMENWATCH_AUTH_TOKEN: ${LUMENWATCH_AUTH_TOKEN:?set a random token}
+      LUMENWATCH_BROWSER_ENABLED: "true"
+      LUMENWATCH_ISOLATED_BROWSER_IMAGE: lumenwatch-browser:1.64.1
+      LUMENWATCH_DATABASE_PATH: /data/lumenwatch.db
+      LUMENWATCH_CAPTURE_DIR: /data/captures
+    volumes:
+      - lumenwatch_data:/data
+      # Required by the isolated worker launcher. Restrict host access to this service.
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8020/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  lumenwatch_data:
