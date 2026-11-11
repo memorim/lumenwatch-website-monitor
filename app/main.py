@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import hmac
 import os
 from contextlib import asynccontextmanager
@@ -85,10 +86,36 @@ def create_app(
         if public_origin:
             if request.headers.get("host") != origin.netloc:
                 return JSONResponse({"detail": "Host not allowed"}, status_code=403)
-            if not hmac.compare_digest(
-                request.headers.get("authorization", "").encode(), ("Bearer " + auth_token).encode()
+            authorization = request.headers.get("authorization", "")
+            basic = authorization.startswith("Basic ")
+            authorized = hmac.compare_digest(
+                authorization.encode(), ("Bearer " + auth_token).encode()
+            )
+            if basic and len(authorization) <= 1024:
+                try:
+                    name, candidate = (
+                        base64.b64decode(authorization[6:], validate=True).decode().split(":", 1)
+                    )
+                    authorized = name == "operator" and hmac.compare_digest(
+                        candidate.encode(), auth_token.encode()
+                    )
+                except (ValueError, UnicodeError):
+                    authorized = False
+            if not authorized:
+                return JSONResponse(
+                    {"detail": "Authentication required"},
+                    status_code=401,
+                    headers={
+                        "WWW-Authenticate": 'Basic realm="LumenWatch", charset="UTF-8"',
+                        "Cache-Control": "no-store",
+                    },
+                )
+            if (
+                basic
+                and request.method not in {"GET", "HEAD", "OPTIONS"}
+                and request.headers.get("origin") != public_origin.rstrip("/")
             ):
-                return JSONResponse({"detail": "Authentication required"}, status_code=401)
+                return JSONResponse({"detail": "Origin not allowed"}, status_code=403)
             if request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get(
                 "origin", public_origin.rstrip("/")
             ) != public_origin.rstrip("/"):
