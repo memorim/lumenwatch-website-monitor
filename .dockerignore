@@ -1,0 +1,11 @@
+.git
+.venv
+.pytest_cache
+.ruff_cache
+data
+captures
+.env
+.env.*
+__pycache__
+pytest-of-agent
+node_modules

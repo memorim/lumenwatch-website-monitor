@@ -1,0 +1,14 @@
+services:
+  caddy:
+    image: caddy:2
+    ports:
+      - "127.0.0.1:8443:443"
+    volumes:
+      - ./Caddyfile.smoke:/etc/caddy/Caddyfile:ro
+      - caddy_smoke_data:/data
+    depends_on:
+      lumenwatch:
+        condition: service_healthy
+
+volumes:
+  caddy_smoke_data:

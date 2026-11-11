@@ -1,3 +1,4 @@
+FROM docker:28-cli AS docker-cli
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -8,9 +9,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY pyproject.toml README.md ./
+COPY requirements-lock.txt ./
 COPY app ./app
+COPY --from=docker-cli /usr/local/bin/docker /usr/local/bin/docker
 
-RUN python -m pip install --no-cache-dir .
+RUN python -m pip install --no-cache-dir -c requirements-lock.txt .
 
 EXPOSE 8020
 

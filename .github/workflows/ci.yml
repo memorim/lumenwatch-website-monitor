@@ -46,6 +46,8 @@ jobs:
       - run: python -m pytest tests/test_isolated_browser.py
         env:
           RUN_DOCKER_BROWSER_TESTS: '1'
+      - run: docker tag lumenwatch-browser:test lumenwatch-browser:1.64.1
+      - run: python deploy/smoke_public.py
 
   browser-demo:
     runs-on: ubuntu-24.04
