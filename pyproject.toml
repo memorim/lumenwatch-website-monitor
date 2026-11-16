@@ -14,7 +14,7 @@ dependencies = [
   "beautifulsoup4>=4.13,<5",
   "fastapi>=0.115,<1",
   "httpx>=0.28,<1",
-  "mcp>=1.27,<2",
+  "mcp>=1.27,<3",
   "uvicorn[standard]>=0.34,<1",
 ]
 
@@ -22,7 +22,7 @@ dependencies = [
 browser = ["playwright>=1.50,<2"]
 dev = [
   "pytest>=9.0.3,<10",
-  "pytest-cov>=6,<7",
+  "pytest-cov>=6,<8",
   "ruff>=0.11,<1",
 ]
 
